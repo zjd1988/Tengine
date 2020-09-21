@@ -28,7 +28,11 @@
 #ifdef CONFIG_BAREMETAL_BUILD
 static int tengine_errno;
 #else
+#ifdef _WIN32
+__declspec(thread) int tengine_errno;
+#else
 static __thread int tengine_errno;
+#endif
 #endif
 
 int DLLEXPORT get_tengine_errno(void)

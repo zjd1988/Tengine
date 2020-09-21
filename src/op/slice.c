@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -43,8 +44,16 @@ static int infer_shape(struct ir_node* node)
     struct ir_tensor* input = get_ir_graph_tensor(ir_graph, node->input_tensors[0]);
     struct slice_param* slice_param = ( struct slice_param* )(node->op.param_mem);
     int dims_len = input->dim_num;
+#ifdef _WIN32
+        int *dims_in = (int*)sys_malloc(dims_len);
+        if(dims_in == NULL)
+        {
+            set_tengine_errno(ENOMEM);
+            return -1;
+        }
+#else    
     int dims_in[dims_len];
-
+#endif
     for (int j = 0; j < dims_len; j++)
     {
         dims_in[j] = input->dims[j];
@@ -72,10 +81,15 @@ static int infer_shape(struct ir_node* node)
         else
         {
             int out_num = node->output_num;
-            if (dims_in[slice_axis] % out_num != 0)
+            if (dims_in[slice_axis] % out_num != 0 || slice_axis > ( int )dims_len)
+            {
+#ifdef _WIN32
+                sys_free(dims_in);
+#endif
                 return -1;
-            if (slice_axis > ( int )dims_len)
-                return -1;
+            }
+            // if (slice_axis > ( int )dims_len)
+            //     return -1;
             dims_in[slice_axis] = dims_in[slice_axis] / out_num;
             for (int i = 0; i < out_num; i++)
             {
@@ -89,7 +103,17 @@ static int infer_shape(struct ir_node* node)
         int dim_len = input->dim_num;
         // std::vector<int> out_dim(dim_len);
         // out_dim.reserve(input_dim.size());
+#ifdef _WIN32
+        int *out_dims = (int*)sys_malloc(dim_len);
+        if(out_dims == NULL)
+        {
+            sys_free(dims_in);
+            set_tengine_errno(ENOMEM);
+            return -1;
+        }
+#else
         int out_dims[dim_len];
+#endif        
         for (int i = 0; i < dim_len; i++)
         {
             if (i == axis)
@@ -105,12 +129,25 @@ static int infer_shape(struct ir_node* node)
         set_ir_tensor_shape(get_ir_graph_tensor(ir_graph, node->output_tensors[0]), out_dims, dim_len);
         // oshape[0].SetDim(out_dim);
         // oshape[0].SetDataLayout(input.GetDataLayout());
+#ifdef _WIN32
+        sys_free(out_dims);
+#endif        
     }
     else if (slice_param->isonnx)
     {
         int axis = slice_param->axis;
         int dim_len = input->dim_num;
+#ifdef _WIN32
+        int *out_dims = (int*)sys_malloc(dim_len);
+        if(out_dims == NULL)
+        {
+            sys_free(dims_in);
+            set_tengine_errno(ENOMEM);
+            return -1;
+        }
+#else
         int out_dims[dim_len];
+#endif
         for (int i = 0; i < dim_len; i++)
         {
             if (i == axis)
@@ -138,21 +175,48 @@ static int infer_shape(struct ir_node* node)
             }
         }
         set_ir_tensor_shape(get_ir_graph_tensor(ir_graph, node->output_tensors[0]), out_dims, dim_len);
+#ifdef _WIN32
+        sys_free(out_dims);
+#endif
     }
     else
     {
         int dim_len = input->dim_num;
+#ifdef _WIN32
+        int *out_dims = (int*)sys_malloc(dim_len);
+        if(out_dims == NULL)
+        {
+            sys_free(dims_in);
+            set_tengine_errno(ENOMEM);
+            return -1;
+        }
+#else
         int out_dims[dim_len];
+#endif
         // input shape size must be equal to begin and size's size;
         if ((slice_param->size_->elem_num != slice_param->begin_->elem_num) ||
             (slice_param->size_->elem_num != dim_len))
+        {
+#ifdef _WIN32
+            sys_free(dims_in);
+            sys_free(out_dims);
+#endif
             return -1;
+        }
+            
         for (unsigned int i = 0; i < dim_len; i++)
         {
             out_dims[i] = *( int* )get_vector_data(slice_param->size_, i);
         }
         set_ir_tensor_shape(get_ir_graph_tensor(ir_graph, node->output_tensors[0]), out_dims, dim_len);
+#ifdef _WIN32
+        sys_free(out_dims);
+#endif        
     }
+    
+#ifdef _WIN32
+            sys_free(dims_in);
+#endif    
     return 0;
 }
 static int init_op(struct ir_op* op)

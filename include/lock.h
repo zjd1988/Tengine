@@ -45,7 +45,43 @@ static inline void unlock(lock_t* l)
 }
 
 #else
+#ifdef _WIN32
+#include <stdbool.h>
+#include <windows.h>
+
+typedef CRITICAL_SECTION pthread_mutex_t;
+typedef void pthread_mutexattr_t;
+
+static inline int pthread_mutex_init(pthread_mutex_t *mutex, pthread_mutexattr_t *attr)
+{
+    (void)attr;
+
+    if (mutex == NULL)
+        return 1;
+
+    InitializeCriticalSection(mutex);
+    return 0;
+}
+
+static inline int pthread_mutex_lock(pthread_mutex_t *mutex)
+{
+    if (mutex == NULL)
+        return 1;
+    EnterCriticalSection(mutex);
+    return 0;
+}
+
+static inline int pthread_mutex_unlock(pthread_mutex_t *mutex)
+{
+    if (mutex == NULL)
+        return 1;
+    LeaveCriticalSection(mutex);
+    return 0;
+}
+#else
+
 #include <pthread.h>
+#endif //_WIN32
 
 typedef pthread_mutex_t lock_t;
 
@@ -63,6 +99,6 @@ static inline void unlock(lock_t* l)
 {
     pthread_mutex_unlock(l);
 }
-#endif
 
-#endif
+#endif //CONFIG_BAREMETAL_BUILD
+#endif //__SYS_LOCK_H__

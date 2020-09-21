@@ -20,7 +20,7 @@
 /*
  * Copyright (c) 2020, OPEN AI LAB
  */
-
+#include <stdint.h>
 #include <math.h>
 #include <string.h>
 #include "tengine_operations.h"

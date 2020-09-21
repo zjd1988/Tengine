@@ -70,8 +70,9 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
     float* pout_data = ( float* )output_tensor->data;
     int num_thread = exec_graph->num_thread;
 
+    int j = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int j = 0; j < chan_num; j++)
+    for (j = 0; j < chan_num; j++)
     {
         float* data = pdata + j * chan_size;
         float* out_data = pout_data + j * chan_size;

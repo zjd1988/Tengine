@@ -43,12 +43,12 @@
 
 #include "tengine_c_api.h"
 
-//#ifndef __ANDROID__
+#if defined(__ANDROID__) ||  defined(__APPLE__)
 #include <sys/syscall.h>
 #include <sched.h>
 #include <unistd.h>
 #include <stdint.h>
-//#endif
+#endif
 
 #if __APPLE__
 #include "TargetConditionals.h"
@@ -120,6 +120,7 @@ int init_cpu_count()
     return core_count;
 }
 
+#ifndef _WIN32
 static int get_max_freq_khz(int cpuid)
 {
     // first try, for all possible cpu
@@ -194,6 +195,7 @@ static int get_max_freq_khz(int cpuid)
     return max_freq_khz;
 }
 
+
 static int set_sched_affinity(size_t thread_affinity_mask)
 {
     // cpu_set_t definition
@@ -241,6 +243,7 @@ static int set_sched_affinity(size_t thread_affinity_mask)
 
     return 0;
 }
+#endif
 
 int init_cluster_mask()
 {
@@ -249,7 +252,7 @@ int init_cluster_mask()
 
     affinity_mask_all_cluster = (1 << core_count) - 1;
 
-    //#ifdef __ANDROID__
+    #ifndef _WIN32
     int max_freq_min_val = INT_MAX;
     int max_freq_max_val = 0;
 
@@ -285,10 +288,10 @@ int init_cluster_mask()
                 affinity_mask_medium_cluster |= (1 << i);
         }
     }
-    //#else
-    //    // TODO implement me for other platforms
-    //    affinity_mask_big_cluster = affinity_mask_all_cluster;
-    //#endif
+    #else
+       // TODO implement me for other platforms
+       affinity_mask_big_cluster = affinity_mask_all_cluster;
+    #endif
 
     return 0;
 }
@@ -339,7 +342,7 @@ int set_cpu_affine(size_t mask)
         return -1;
 #endif
 
-#elif __APPLE_IOS__
+#elif __APPLE_IOS__ || _WIN32
     // thread affinity not supported on ios
     ( void )mask;
     return -1;

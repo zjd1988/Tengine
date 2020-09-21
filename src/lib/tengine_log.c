@@ -122,6 +122,7 @@ struct logger* get_default_logger(void)
     if (inited)
         return &default_logger;
 
+    init_lock(&log_lock);
     lock(&log_lock);
 
     if (!inited)

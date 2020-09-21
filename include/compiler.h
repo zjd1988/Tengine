@@ -25,6 +25,17 @@
 #ifndef __SYS_COMPILER_H__
 #define __SYS_COMPILER_H__
 
+#ifdef _WIN32
+#define DLLEXPORT __declspec(dllexport)
+
+// #ifndef offsetof
+// #define offsetof(TYPE, MEMBER) ((size_t) & (( TYPE* )0)->MEMBER)
+// #endif
+
+#define container_of(ptr, type, member)                      \
+    (type*)((char*)ptr - offsetof(type, member))
+
+#else
 #define DLLEXPORT __attribute__((visibility("default")))
 
 #ifndef offsetof
@@ -37,6 +48,7 @@
         ( type* )(( char* )__mptr - offsetof(type, member)); \
     })
 
+#endif
 #define UNIQ_DUMMY_NAME_WITH_LINE0(a, b) auto_dummy_##a##_##b
 
 #define UNIQ_DUMMY_NAME_WITH_LINE(a, b) UNIQ_DUMMY_NAME_WITH_LINE0(a, b)

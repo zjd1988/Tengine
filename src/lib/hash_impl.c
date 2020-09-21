@@ -64,6 +64,7 @@ static void release_hash_entry(struct hash_impl* h, struct hash_entry* e)
     sys_free(e);
 }
 
+
 static void release_hash(struct hash* t)
 {
     struct hash_impl* h = ( struct hash_impl* )t;
@@ -76,9 +77,14 @@ static void release_hash(struct hash* t)
 
         if (h->mt_safe)
             lock(&b->lock);
-
-        list_for_each_entry_safe(pos, dummy, &b->head, link) release_hash_entry(h, pos);
-
+#ifdef _WIN32
+        list_for_each_entry_safe(pos, struct hash_entry, dummy, &b->head, link)
+#else
+        list_for_each_entry_safe(pos, dummy, &b->head, link)
+#endif
+		{
+			release_hash_entry(h, pos);
+		}
         if (h->mt_safe)
             unlock(&b->lock);
     }
@@ -132,8 +138,11 @@ static struct hash_entry* find_entry(struct hash* t, const void* key, int key_si
 #ifdef HASH_STATS
     b->search_count++;
 #endif
-
-    list_entry_for_each(e, &b->head, link)
+#ifdef _WIN32
+    list_entry_for_each(e, struct hash_entry, &b->head, link)
+#else
+    list_entry_for_each(e, &b->head, link)    
+#endif    
     {
         if (compare_hash_key(e->key, e->key_size, key, key_size) == 0)
         {
@@ -168,7 +177,11 @@ static int insert_hash(struct hash* t, const void* key, int key_size, void* data
     if (h->mt_safe)
         lock(&b->lock);
 
+#ifdef _WIN32
+    list_entry_for_each(e, struct hash_entry, &b->head, link)
+#else
     list_entry_for_each(e, &b->head, link)
+#endif
     {
         if (compare_hash_key(e->key, e->key_size, key, key_size) == 0)
         {
@@ -220,8 +233,11 @@ static int delete_hash(struct hash* t, const void* key, int key_size)
 
     if (h->mt_safe)
         lock(&b->lock);
-
+#ifdef _WIN32
+    list_entry_for_each(e, struct hash_entry, &b->head, link)
+#else
     list_entry_for_each(e, &b->head, link)
+#endif    
     {
         if (compare_hash_key(e->key, e->key_size, key, key_size) == 0)
         {
@@ -304,7 +320,7 @@ static hash_entry_t get_next_entry(struct hash* t)
 
         if (!list_entry_is_last(h->seq_ptr, &b->head, link))
         {
-            h->seq_ptr = list_entry_next(h->seq_ptr, link);
+            h->seq_ptr = list_entry_next(h->seq_ptr, struct hash_entry, link);
             return h->seq_ptr;
         }
 
@@ -369,3 +385,4 @@ struct hash* create_hash_impl(void)
 
     return h;
 }
+

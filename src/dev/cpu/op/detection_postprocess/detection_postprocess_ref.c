@@ -75,7 +75,11 @@ static float intersection_area(const struct Dpp_Box a, const struct Dpp_Box b)
 static void nms_sorted_bboxes(const struct Dpp_Box* boxes, int boxes_size, int* picked, int* picked_size,
                                      float nms_threshold)
 {
+#ifdef _WIN32
+    float* areas = (float*)sys_malloc(sizeof(float) * boxes_size);
+#else
     float areas[boxes_size];
+#endif
     int n_picked = 0;
     for(int i = 0; i < boxes_size; i++)
     {
@@ -105,6 +109,9 @@ static void nms_sorted_bboxes(const struct Dpp_Box* boxes, int boxes_size, int* 
         }
     }
     *picked_size = n_picked;
+#ifdef _WIN32
+    sys_free(areas);
+#endif   
 }
 
 static void sort_boxes_by_score(struct Dpp_Box* boxes, int size)
@@ -220,8 +227,13 @@ int ref_dpp_fp32(const float* input_f, const float* score_f, const float* anchor
         if(box_size > max_detections * 2)
             box_size = max_detections * 2;
 
+#ifdef _WIN32
+        int *picked = (int*)malloc(sizeof(int) * num_boxes);
+#else
         int picked[num_boxes];
+#endif
         int picked_size = 0;
+
 
         picked[0] = 0;
         nms_sorted_bboxes(class_box, box_size, picked, &picked_size, param->nms_iou_threshold);
@@ -307,7 +319,11 @@ int ref_dpp_uint8(const uint8_t* input, const uint8_t* score, const uint8_t* anc
         if(box_size > max_detections * 2)
             box_size = max_detections * 2;
 
+#ifdef _WIN32
+        int* picked = (int*)sys_malloc(sizeof(int) * num_boxes);
+#else
         int picked[num_boxes];
+#endif        
         int picked_size = 0;
 
         picked[0] = 0;
@@ -320,6 +336,9 @@ int ref_dpp_uint8(const uint8_t* input, const uint8_t* score, const uint8_t* anc
             memcpy(picked_boxes + all_picked_size, class_box + z, sizeof(struct Dpp_Box));
             all_picked_size++;
         }
+#ifdef _WIN32
+        sys_free(picked);
+#endif        
     }
 
     sort_boxes_by_score(picked_boxes, max_picked_boxes);

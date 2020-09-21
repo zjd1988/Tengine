@@ -49,9 +49,16 @@ static int infer_shape(struct ir_node* node)
         set_tengine_errno(ENOENT);
         return -1;
     }
-
+#ifdef _WIN32
+    int *outdims = (int*)sys_malloc(input->dim_num*sizeof(int));
+    if(outdims == NULL)
+    {
+        set_tengine_errno(ENOMEM);
+        return -1;
+    }
+#else
     int outdims[input->dim_num];
-
+#endif
     // Change HWC to CHW
     int tmp = input->dims[2];
     input->dims[2] = input->dims[1];
@@ -85,7 +92,9 @@ static int infer_shape(struct ir_node* node)
     }
 
     set_ir_tensor_shape(output, outdims, input->dim_num);
-
+#ifdef _WIN32
+    sys_free(outdims);
+#endif
     return 0;
 }
 

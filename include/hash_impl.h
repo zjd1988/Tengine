@@ -30,17 +30,6 @@
 
 #define HASH_STATS
 
-struct hash_bucket;
-
-struct hash_entry
-{
-    void* data;
-    void* key;
-    int key_size;
-    struct list link;
-    struct hash_bucket* bucket;
-};
-
 struct hash_bucket
 {
     int entry_count;
@@ -57,9 +46,18 @@ struct hash_bucket
 #endif
 };
 
-struct hash_impl
+struct hash_entry
 {
-    struct hash interface;
+    void* data;
+    void* key;
+    int key_size;
+    struct list link;
+    struct hash_bucket* bucket;
+};
+
+struct hash_impl
+{  
+    struct hash hash_interface;
 
     /* data fields */
     int bucket_size;

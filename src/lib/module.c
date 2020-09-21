@@ -51,6 +51,7 @@ static struct vector* exit_vector[MOD_MAX_LEVEL];
 /* this function may be called before main(), in constructor */
 static int register_module_init(int level, const char* name, module_init_func_t func, void* arg, int crit)
 {
+    printf("run %s\n", name);
     struct module_init_func_entry e;
 
     if (!init_vector_created)

@@ -62,8 +62,9 @@ int ref_squareddifference_fp32(struct ir_tensor* input_tensor_0, struct ir_tenso
         float* input1 = input_tensor_1->data;
         float* output = output_tensor->data;
 
+        int q = 0;
 #pragma omp parallel for num_threads(num_thread)
-        for (int q = 0; q < channels; q++)
+        for (q = 0; q < channels; q++)
         {
             float* src0 = input0 + c_step * q;
             float* src1 = input1 + c_step * q;

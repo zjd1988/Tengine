@@ -30,10 +30,8 @@
 #if __SSE2__
 #include <emmintrin.h>
 #endif
+#ifndef _WIN32
 #include <sys/time.h>
-#define max(a, b) ((a) > (b) ? (a) : (b))
-#define min(a, b) ((a) < (b) ? (a) : (b))
-
 static double get_current_time()
 {
     struct timeval tv;
@@ -41,6 +39,12 @@ static double get_current_time()
 
     return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
+#endif
+
+
+
 
 static int get_private_mem_size(struct ir_tensor* filter)
 {
@@ -182,8 +186,8 @@ static void im2col_ir(struct ir_tensor* input, struct ir_tensor* output, struct 
     int image_size = input->dims[1] * input->dims[2] * input->dims[3];
     int group_size = input_chan * input->dims[2] * input->dims[3];
 
-    void* input_base = input->data + (n * image_size + group * group_size) * input->elem_size;
-    void* im2col_buf = priv_info->im2col_buffer;
+    uint8_t* input_base = (uint8_t*)(input->data) + (n * image_size + group * group_size) * input->elem_size;
+    float* im2col_buf = (float*)priv_info->im2col_buffer;
 
     if (input->data_type == TENGINE_DT_UINT8)
         im2col_uint8(input_base, im2col_buf, input, output, param);
@@ -199,8 +203,9 @@ void input_pack4(int K, int N, float* pB, float* pB_t, int num_thread)
     int remian_size_start = nn_size << 3;
 
 // [ch00, ch10, ch20, ch30, ch01, ch11, ch21, ch31, ch02, ch12, ch22, ch32, ch03, ch13, ch23, ch33 ....]
+    int ii = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int ii = 0; ii < nn_size; ii++)
+    for (ii = 0; ii < nn_size; ii++)
     {
         int i = ii * 8;
         const float* img = pB + i;
@@ -226,8 +231,9 @@ void input_pack4(int K, int N, float* pB, float* pB_t, int num_thread)
     }
 
 // [ch00, ch01, ch02, ch03 ....]
+    int i = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int i = remian_size_start; i < N; i++)
+    for (i = remian_size_start; i < N; i++)
     {
         const float* img = pB + i;
         float* tmp = pB_t + (i / 8 + i % 8) * 8 * K;
@@ -248,9 +254,9 @@ static void sgemm(int M, int N, int K, float* pA_t, float* pB_t, float* pC, int 
 
     nn_outch = M >> 3;
     remain_outch_start = nn_outch << 3;
-
+    int pp = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int pp = 0; pp < nn_outch; pp++)
+    for (pp = 0; pp < nn_outch; pp++)
     {
         int i = pp * 8;
 
@@ -884,8 +890,9 @@ void input_pack4(int K, int N, float* pB, float* pB_t, int num_thread)
     int remian_size_start = nn_size << 2;
 
 // [ch00, ch10, ch20, ch30, ch01, ch11, ch21, ch31, ch02, ch12, ch22, ch32, ch03, ch13, ch23, ch33 ....]
+    int ii = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int ii = 0; ii < nn_size; ii++)
+    for (ii = 0; ii < nn_size; ii++)
     {
         int i = ii * 4;
         const float* img = pB + i;
@@ -907,8 +914,9 @@ void input_pack4(int K, int N, float* pB, float* pB_t, int num_thread)
     }
 
 // [ch00, ch01, ch02, ch03 ....]
+    int i = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int i = remian_size_start; i < N; i++)
+    for (i = remian_size_start; i < N; i++)
     {
         const float* img = pB + i;
         float* tmp = pB_t + (i / 4 + i % 4) * 4 * K;
@@ -932,8 +940,9 @@ static void sgemm(int M, int N, int K, float* pA_t, float* pB_t, float* pC, int 
     remain_outch_start = nn_outch << 2;
 
 // output ch0 - ch3
+    int pp = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int pp = 0; pp < nn_outch; pp++)
+    for (pp = 0; pp < nn_outch; pp++)
     {
         int i = pp * 4;
 
@@ -1139,8 +1148,9 @@ static void sgemm(int M, int N, int K, float* pA_t, float* pB_t, float* pC, int 
     }
 
 // output ch0
+    int i = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int i = remain_outch_start; i < M; i++)
+    for (i = remain_outch_start; i < M; i++)
     {
         float* output = pC + i * N;
 

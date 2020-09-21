@@ -172,9 +172,9 @@ void conv3x3s1_winograd43_sse(float* bottom_blob, float* top_blob, float* kernel
         __m256 _4_n = _mm256_set1_ps(-4);
         __m256 _5_n = _mm256_set1_ps(-5);
 #endif
-
+        int q = 0;
 #pragma omp parallel for num_threads(num_thread)
-        for (int q = 0; q < inch; q++)
+        for (q = 0; q < inch; q++)
         {
             const float* img = bottom_blob_bordered + q * w * h;
 
@@ -540,9 +540,9 @@ void conv3x3s1_winograd43_sse(float* bottom_blob, float* top_blob, float* kernel
         const int tiles_n = 36 * tiles;
 
         top_blob_tm = dot_block;
-
+        int r = 0;
 #pragma omp parallel for num_threads(num_thread)
-        for (int r = 0; r < 9; r++)
+        for (r = 0; r < 9; r++)
         {
             int nn_outch = 0;
             int remain_outch_start = 0;
@@ -997,9 +997,9 @@ void conv3x3s1_winograd43_sse(float* bottom_blob, float* top_blob, float* kernel
         int nRowBlocks = w_tm / 6;
 
         const int tiles = nColBlocks * nRowBlocks;
-
+        int p = 0;
 #pragma omp parallel for num_threads(num_thread)
-        for (int p = 0; p < outch; p++)
+        for (p = 0; p < outch; p++)
         {
             float* out_tile = top_blob_tm + 36 * tiles * p;
             float* outRow0 = top_blob_bordered + outw_align * outh_align * p;
@@ -1112,9 +1112,9 @@ void conv3x3s1_winograd43_transform_kernel_sse(const float* kernel, float* kerne
     const float ktm[6][3] = {
         {1.0f / 4, 0.0f, 0.0f},           {-1.0f / 6, -1.0f / 6, -1.0f / 6}, {-1.0f / 6, 1.0f / 6, -1.0f / 6},
         {1.0f / 24, 1.0f / 12, 1.0f / 6}, {1.0f / 24, -1.0f / 12, 1.0f / 6}, {0.0f, 0.0f, 1.0f}};
-
+	int p = 0;
 #pragma omp parallel for
-    for (int p = 0; p < outch; p++)
+    for (p = 0; p < outch; p++)
     {
         for (int q = 0; q < inch; q++)
         {
@@ -1412,7 +1412,7 @@ int wino_conv_hcl_run(struct ir_tensor* input_tensor, struct ir_tensor* filter_t
     {
         for (int g = 0; g < group; g++)
         {
-            conv3x3s1_winograd43_sse(priv_info->input_pad + i * input_size + g * input_size_g, output,
+            conv3x3s1_winograd43_sse((float*)((char*)priv_info->input_pad + i * input_size + g * input_size_g), output,
                                      priv_info->interleave_buffer, priv_info->dot_block, priv_info->transform_input,
                                      priv_info->output_bordered, biases, padded_in_w, padded_in_h, in_c, out_w, out_h,
                                      out_c, num_thread);

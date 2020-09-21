@@ -31,6 +31,9 @@
 #include "param_type.h"
 #include "va_arg_util.h"
 
+#ifdef _WIN32
+#define CONFIG_DISABLE_PARAM_ACCESS
+#else
 #define ADD_PARAM_ENTRY(map, idx, s, e)                   \
     {                                                     \
         struct s dummy;                                   \
@@ -44,7 +47,7 @@
         p_entry->size = size;                             \
         idx++;                                            \
     }
-
+#endif
 #ifdef CONFIG_DISABLE_PARAM_ACCESS
 
 #define GET_PARAM_PARSE_MAP(s) (( void* )0)

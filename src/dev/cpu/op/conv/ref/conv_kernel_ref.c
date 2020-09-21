@@ -128,7 +128,7 @@ static void im2col_fp32(struct ir_tensor* input, struct ir_tensor* output, struc
     int image_size = input->dims[1] * input->dims[2] * input->dims[3];
     int group_size = input_chan * input->dims[2] * input->dims[3];
 
-    void* input_base = input->data + (n * image_size + group * group_size) * input->elem_size;
+    void* input_base = (void*)((char*)(input->data) + (n * image_size + group * group_size) * input->elem_size);
     void* im2col_buf = priv_info->im2col_buffer;
 
     float scale = input->scale;
@@ -185,7 +185,7 @@ static void im2col_uint8(struct ir_tensor* input, struct ir_tensor* output, stru
     int image_size = input->dims[1] * input->dims[2] * input->dims[3];
     int group_size = input_chan * input->dims[2] * input->dims[3];
 
-    void* input_base = input->data + (n * image_size + group * group_size) * input->elem_size;
+    void* input_base = (void*)((char*)input->data + (n * image_size + group * group_size) * input->elem_size);
     void* im2col_buf = priv_info->im2col_buffer;
 
     float scale = input->scale;
@@ -253,9 +253,9 @@ static void sgemm_fp32(struct ir_tensor* input, struct ir_tensor* filter, struct
 
     if (bias)
         bias_fp32 = ( float* )bias->data + outchan_g * group;
-
+    int i = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int i = 0; i < outchan_g; i++)
+    for (i = 0; i < outchan_g; i++)
     {
         float* kernel = interleave_fp32 + i * kernel_size;
         float* input = im2col_fp32;
@@ -346,9 +346,9 @@ static void sgemm_uint8(struct ir_tensor* input, struct ir_tensor* filter, struc
         bias_int32 = ( int32_t* )bias->data + outchan_g * group;
         bias_scale = input->scale * filter->scale;
     }
-
+    int i = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int i = 0; i < outchan_g; i++)
+    for (i = 0; i < outchan_g; i++)
     {
         float* kernel = interleave_fp32 + i * kernel_size;
         float* input = im2col_fp32;

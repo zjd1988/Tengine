@@ -72,9 +72,9 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
     {
         float* idata = ( float* )input_tensor->data;
         __fp16* odata = ( __fp16* )output_tensor->data;
-
+        int i = 0;
 #pragma omp parallel for num_threads(num_thread)
-        for (int i = 0; i < (channel_num * batch_number); i++)
+        for (i = 0; i < (channel_num * batch_number); i++)
         {
             int offset = i * channel_size;
             for (int j = 0; j < channel_size; j++)
@@ -89,8 +89,9 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
         __fp16* idata = ( __fp16* )input_tensor->data;
         float* odata = ( float* )output_tensor->data;
 
+        int i = 0;
 #pragma omp parallel for num_threads(num_thread)
-        for (int i = 0; i < (channel_num * batch_number); i++)
+        for (i = 0; i < (channel_num * batch_number); i++)
         {
             int offset = i * channel_size;
             for (int j = 0; j < channel_size; j++)

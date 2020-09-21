@@ -23,7 +23,7 @@
  */
 
 #include <math.h>
-#include <unistd.h>
+// #include <unistd.h>
 #include "sys_port.h"
 #include "module.h"
 #include "tengine_ir.h"
@@ -117,7 +117,11 @@ static inline float intersection_area(const Box_t* a, const Box_t* b)
 
 void nms_sorted_bboxes(const Box_t* bboxes, int bboxes_num, int* picked, int* picked_num, float nms_threshold)
 {
+#ifdef _WIN32
+	float* areas = (float*)sys_malloc(sizeof(float) * bboxes_num);
+#else
     float areas[bboxes_num];
+#endif
     for (int i = 0; i < bboxes_num; i++)
     {
         float width = bboxes[i].x1 - bboxes[i].x0;
@@ -145,6 +149,9 @@ void nms_sorted_bboxes(const Box_t* bboxes, int bboxes_num, int* picked, int* pi
             *picked_num += 1;
         }
     }
+#ifdef _WIN32
+	sys_free(areas);
+#endif
 }
 
 static int init_node(struct node_ops* node_ops, struct exec_node* exec_node, struct exec_graph* exec_graph)
@@ -225,14 +232,21 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
     float* loc_ptr   = location + b * num_priorx4;
     float* conf_ptr  = confidence + b * num_prior * num_classes;
     float* prior_ptr = priorbox + b * num_priorx4 * 2;
-
+#ifdef _WIN32
+    Box_t* boxes = (Box_t*)sys_malloc(sizeof(Box_t) * num_prior);
+#else
     Box_t boxes[num_prior];
+#endif
     get_boxes(boxes, num_prior, loc_ptr, prior_ptr);
     struct vector* output_bbox_v = create_vector(sizeof(Box_t), NULL);
 
     for (int i = 1; i < num_classes; i++)
     {
+#ifdef _WIN32
+        Box_t* class_box = (Box_t*)sys_malloc(sizeof(Box_t) * num_prior);
+#else
         Box_t class_box[num_prior];
+#endif
         int class_box_num = 0;
         for (int j = 0; j < num_prior; j++)
         {
@@ -249,8 +263,11 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
 
         if (class_box_num > param->nms_top_k)
             class_box_num = param->nms_top_k;
-
+#ifdef _WIN32
+        int* picked = (int*)sys_malloc(sizeof(int) * class_box_num);
+#else
         int picked[class_box_num];    // = NULL;
+#endif
         int picked_num = 0;
         nms_sorted_bboxes(class_box, class_box_num, picked, &picked_num, param->nms_threshold);
 
@@ -259,6 +276,10 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
             int z = picked[j];
             push_vector_data(output_bbox_v, &class_box[z]);
         }
+#ifdef _WIN32
+        sys_free(class_box);
+        sys_free(picked);
+#endif        
     }
 
     int total_num = get_vector_num(output_bbox_v);
@@ -322,7 +343,9 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
         sys_free(priorbox);
         sys_free(output_fp32);
     }
-
+#ifdef _WIN32
+    sys_free(boxes);
+#endif        
     return 0;
 }
 

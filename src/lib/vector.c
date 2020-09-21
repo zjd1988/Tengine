@@ -26,7 +26,7 @@
 
 #include "vector.h"
 
-struct vector* create_vector(int elem_size, void (*free_data)(void*))
+DLLEXPORT struct vector* create_vector(int elem_size, void (*free_data)(void*))
 {
     struct vector* v = ( struct vector* )sys_malloc(sizeof(struct vector));
 
@@ -44,7 +44,7 @@ struct vector* create_vector(int elem_size, void (*free_data)(void*))
     v->space_num = v->ahead_num;
 
     v->real_mem = sys_malloc(v->entry_size * v->space_num + VECTOR_ALIGN_SIZE);
-    v->mem = ( void* )((( long )v->real_mem) & (~(VECTOR_ALIGN_SIZE - 1)));
+    v->mem = ( void* )((( size_t )v->real_mem) & (~(VECTOR_ALIGN_SIZE - 1)));
 
     for (int i = 0; i < v->space_num; i++)
     {
@@ -55,7 +55,7 @@ struct vector* create_vector(int elem_size, void (*free_data)(void*))
     return v;
 }
 
-int resize_vector(struct vector* v, int new_size)
+DLLEXPORT int resize_vector(struct vector* v, int new_size)
 {
     void* new_mem;
 
@@ -134,7 +134,7 @@ int remove_vector_data(struct vector* v, void* data)
     return 0;
 }
 
-void release_vector(struct vector* v)
+DLLEXPORT void release_vector(struct vector* v)
 {
     for (int i = 0; i < v->elem_num; i++)
     {

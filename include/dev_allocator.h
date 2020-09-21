@@ -42,6 +42,14 @@ struct dev_allocator* get_default_dev_allocator(void);
 
 struct dev_allocator* get_dev_allocator(const char* dev_name);
 
-#define REGISTER_DEV_ALLOCATOR(func_name) static void(func_name)(void) __attribute__((constructor))
+#ifdef _WIN32
+#define REGISTER_DEV_ALLOCATOR(func_name)                     \
+static void func_name(void);                                  \
+__pragma(data_seg(".CRT$XIU"))                                \
+static void(*UNIQ_DUMMY_NAME(initptr))(void) = func_name;     \
+__pragma(data_seg())
 
+#else
+#define REGISTER_DEV_ALLOCATOR(func_name) static void(func_name)(void) __attribute__((constructor))
+#endif
 #endif

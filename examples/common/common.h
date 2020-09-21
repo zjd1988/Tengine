@@ -26,12 +26,12 @@
 
 #include <math.h>
 #include <string.h>
-#include <unistd.h>
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #else    // _WIN32
+#include <unistd.h>
 #include <sys/time.h>
 #endif    // _WIN32
 

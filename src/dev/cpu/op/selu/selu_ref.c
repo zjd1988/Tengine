@@ -44,8 +44,9 @@ int ref_selu_fp32(struct ir_tensor* output_tensor, struct ir_tensor* input_tenso
     int chan_num = input_tensor->dims[0] * input_tensor->dims[1];
     int chan_size = input_tensor->dims[2] * input_tensor->dims[3];
 
+    int i = 0;
 #pragma omp parallel for num_threads(num_thread)
-    for (int i = 0; i < chan_num; i++)
+    for (i = 0; i < chan_num; i++)
     {
         int offset = i * chan_size;
         float* input_data = ( float* )input_tensor->data + i * chan_size;

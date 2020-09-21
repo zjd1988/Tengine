@@ -72,27 +72,31 @@ struct packed_ir_graph
 
 static struct packed_tensor* get_first_packed_tensor(struct packed_ir_graph* p_graph)
 {
-    void* addr = p_graph;
+    //visual studio error C2036: "void *": unknown size
+    char* addr = (char*)p_graph;
 
     return ( struct packed_tensor* )(addr + p_graph->tensor_offset);
 }
 
 static struct packed_tensor* get_next_packed_tensor(struct packed_tensor* p_tensor)
 {
-    void* addr = p_tensor;
+    //visual studio error C2036: "void *": unknown size
+    char* addr = (char*)p_tensor;
     return ( struct packed_tensor* )(addr + p_tensor->size);
 }
 
 static struct packed_node* get_first_packed_node(struct packed_ir_graph* p_graph)
 {
-    void* addr = p_graph;
+    //visual studio error C2036: "void *": unknown size
+    char* addr = (char*)p_graph;
 
     return ( struct packed_node* )(addr + p_graph->node_offset);
 }
 
 static struct packed_node* get_next_packed_node(struct packed_node* p_node)
 {
-    void* addr = p_node;
+    //visual studio error C2036: "void *": unknown size
+    char* addr = (char*)p_node;
 
     return ( struct packed_node* )(addr + p_node->size);
 }
@@ -150,8 +154,8 @@ static struct packed_node* pack_ir_node(struct ir_node* node)
     else
     {
         packed->input_offset = offset;
-
-        int16_t* ptr = ( int16_t* )(( void* )packed + offset);
+        //visual studio error C2036: "void *": unknown size
+        int16_t* ptr = ( int16_t* )(( char* )packed + offset);
 
         for (int i = 0; i < node->input_num; i++)
             ptr[i] = node->input_tensors[i];
@@ -164,7 +168,8 @@ static struct packed_node* pack_ir_node(struct ir_node* node)
     else
     {
         packed->output_offset = offset;
-        int16_t* ptr = ( int16_t* )(( void* )packed + offset);
+        //visual studio error C2036: "void *": unknown size
+        int16_t* ptr = ( int16_t* )(( char* )packed + offset);
 
         for (int i = 0; i < node->output_num; i++)
             ptr[i] = node->output_tensors[i];
@@ -338,7 +343,8 @@ struct ir_graph* unpack_ir_graph(const void* mem, int mem_size)
             ir_node->input_tensors[0] = packed_node->input_offset;
         else
         {
-            int16_t* ptr = ( int16_t* )(( void* )packed_node + packed_node->input_offset);
+            //visual studio error C2036: "void *": unknown size
+            int16_t* ptr = ( int16_t* )(( char* )packed_node + packed_node->input_offset);
             for (int j = 0; j < packed_node->input_num; j++)
                 ir_node->input_tensors[j] = ptr[j];
         }
@@ -347,7 +353,8 @@ struct ir_graph* unpack_ir_graph(const void* mem, int mem_size)
             ir_node->output_tensors[0] = packed_node->output_offset;
         else
         {
-            int16_t* ptr = ( int16_t* )(( void* )packed_node + packed_node->output_offset);
+            //visual studio error C2036: "void *": unknown size
+            int16_t* ptr = ( int16_t* )(( char* )packed_node + packed_node->output_offset);
             for (int j = 0; j < packed_node->output_num; j++)
                 ir_node->output_tensors[j] = ptr[j];
         }

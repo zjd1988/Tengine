@@ -347,7 +347,16 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
 
     int out_num = exec_node->output_num;
 
+#ifdef _WIN32
+    struct shape_dim *sd = (struct shape_dim*)sys_malloc(sizeof(struct shape_dim) * out_num);
+    if(sd == NULL)
+    {
+        set_tengine_errno(ENOMEM);
+        return -1;        
+    }
+#else
     struct shape_dim sd[out_num];
+#endif
     int8_t** out_data_ptrs = ( int8_t** )sys_malloc(out_num * sizeof(int8_t*));
 
     op_param.axis = _param->axis;
@@ -416,6 +425,10 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
             input_tensor->dims[2] == out_tensor->dims[2] && input_tensor->dims[3] == out_tensor->dims[3])
         {
             memcpy(( void* )(out_data_ptrs[0]), ( void* )input, mem_size);
+            sys_free(out_data_ptrs);
+#ifdef _WIN32
+            sys_free(sd);
+#endif            
             return true;
         }
     }
@@ -455,6 +468,9 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
 
     int ret = ref_slice_common(input, out_data_ptrs, sizeof(float), &op_param);
     sys_free(out_data_ptrs);
+#ifdef _WIN32
+    sys_free(sd);
+#endif
     if (ret < 0)
         return -1;
 

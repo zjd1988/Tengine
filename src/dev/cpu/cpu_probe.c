@@ -57,7 +57,7 @@ struct probed_cpu_info* get_probed_cpu_info(void)
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
+// #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>

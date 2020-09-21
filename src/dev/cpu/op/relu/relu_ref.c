@@ -50,8 +50,9 @@ static int ref_relu_fp32(struct ir_tensor* input_tensor, struct ir_tensor* outpu
     {
         for (int n = 0; n < batch; n++)
         {
+            int q = 0;
 #pragma omp parallel for num_threads(num_thread)
-            for (int q = 0; q < channels; q++)
+            for (q = 0; q < channels; q++)
             {
                 float* src = input_data + batch_step * n + c_step * q;
                 float* dst = out_data + batch_step * n + c_step * q;
@@ -70,8 +71,9 @@ static int ref_relu_fp32(struct ir_tensor* input_tensor, struct ir_tensor* outpu
     {
         for (int n = 0; n < batch; n++)
         {
+            int q = 0;
 #pragma omp parallel for num_threads(num_thread)
-            for (int q = 0; q < channels; q++)
+            for (q = 0; q < channels; q++)
             {
                 float* src = input_data + batch_step * n + c_step * q;
                 float* dst = out_data + batch_step * n + c_step * q;

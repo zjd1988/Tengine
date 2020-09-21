@@ -37,8 +37,11 @@
 #include "tengine_op.h"
 #include "compiler_fp16.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <sys/time.h>
-
+#endif
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <stdio.h>
@@ -48,6 +51,17 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+
+#ifdef DEBUG_TIME
+void gettimeofday(struct timeval *tv, void *tz)
+{
+    long int l = GetTickCount();
+ 
+    tv->tv_sec = l / 1000;
+    tv->tv_usec = (l % 1000) * 1000;
+    return;
+} 
+#endif
 
 #ifdef DEBUG_DATA
 char* ReplaceSubStr(const char* str, const char* srcSubStr, const char* dstSubStr, char* out)

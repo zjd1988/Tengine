@@ -1,5 +1,5 @@
-#define FLOAT_MAX 3.4028235E38
-#define FLOAT_MIN -3.4028235E38
+#define FLOAT_MAX 3.402823466E38
+#define FLOAT_MIN -3.402823466E38
 void sum_4d_ax0(int dim0, int dim1, int dim2, int dim3, float* data, float* tmp);
 void sum_4d_ax1(int dim0, int dim1, int dim2, int dim3, float* data, float* tmp);
 void sum_4d_ax2(int dim0, int dim1, int dim2, int dim3, float* data, float* tmp);

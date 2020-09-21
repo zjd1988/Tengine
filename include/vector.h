@@ -52,10 +52,10 @@ struct vector
     void (*free_func)(void*);
 };
 
-struct vector* create_vector(int elem_size, void (*free_data)(void*));
-void release_vector(struct vector* v);
+DLLEXPORT struct vector* create_vector(int elem_size, void (*free_data)(void*));
+DLLEXPORT void release_vector(struct vector* v);
 
-int resize_vector(struct vector* v, int new_size);
+DLLEXPORT int resize_vector(struct vector* v, int new_size);
 void remove_vector_data_not_tail(struct vector* v, int idx);
 
 static inline struct vector_entry* get_vector_entry(struct vector* v, int idx)

@@ -62,8 +62,9 @@ static int ref_batchnorm_fp32(float* input, float* output, const struct ref_batc
 
     for (int n = 0; n < param->input_n; ++n)
     {
+        int h = 0;
 #pragma omp parallel for num_threads(num_thread)
-        for (int h = 0; h < param->input_h; ++h)
+        for (h = 0; h < param->input_h; ++h)
         {
             for (int w = 0; w < param->input_w; ++w)
             {

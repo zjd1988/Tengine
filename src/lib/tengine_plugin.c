@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <string.h>
+#ifdef _WIN32
+#include <windows.h>
+#include <tchar.h>
+#else
 #include <dlfcn.h>
-
+#endif
 #include "compiler.h"
 #include "sys_port.h"
 #include "tengine_c_api.h"
@@ -10,8 +14,12 @@
 #include "vector.h"
 
 typedef const char* const_char_t;
+#ifdef _WIN32
+typedef int(*fun_ptr)(void);
+typedef HINSTANCE so_handle_t;
+#else
 typedef void* so_handle_t;
-
+#endif
 struct plugin_header
 {
     char* name;
@@ -23,11 +31,18 @@ static struct vector* plugin_list = NULL;
 
 static int exec_so_func(so_handle_t handle, const char* func_name)
 {
+#ifdef _WIN32
+    void* func = (fun_ptr)GetProcAddress(handle, func_name);
+#else
     void* func = dlsym(handle, func_name);
-
+#endif
     if (func == NULL)
     {
+#ifdef _WIN32
+		TLOG_ERR("find func: %s failed, error code %d\n", func_name, GetLastError());
+#else
         TLOG_ERR("find func: %s failed, reason %s\n", func_name, dlerror());
+#endif
         return -1;
     }
 
@@ -75,11 +90,18 @@ int DLLEXPORT load_tengine_plugin(const char* plugin_name, const char* fname, co
     }
 
     /* load the so */
+#ifdef _WIN32
+    header.handle = LoadLibraryA(fname);
+#else
     header.handle = dlopen(fname, RTLD_LAZY);
-
+#endif
     if (header.handle == NULL)
     {
+#ifdef _WIN32
+		TLOG_ERR("load plugin failed: error code %d\n", GetLastError());
+#else
         TLOG_ERR("load plugin failed: %s\n", dlerror());
+#endif
         set_tengine_errno(EINVAL);
         return -1;
     }
@@ -88,7 +110,11 @@ int DLLEXPORT load_tengine_plugin(const char* plugin_name, const char* fname, co
     if (init_func_name && exec_so_func(header.handle, init_func_name) < 0)
     {
         set_tengine_errno(EINVAL);
+#ifdef _WIN32
+        FreeLibrary(header.handle);
+#else
         dlclose(header.handle);
+#endif        
         return -1;
     }
 
@@ -127,9 +153,11 @@ int DLLEXPORT unload_tengine_plugin(const char* plugin_name, const char* rel_fun
 
     if (rel_func_name)
         exec_so_func(target->handle, rel_func_name);
-
+#ifdef _WIN32
+	FreeLibrary(target->handle);
+#else
     dlclose(target->handle);
-
+#endif
     remove_vector_data(plugin_list, target);
 
     if (get_vector_num(plugin_list) == 0)
