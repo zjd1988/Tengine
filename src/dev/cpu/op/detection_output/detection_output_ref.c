@@ -23,7 +23,6 @@
  */
 
 #include <math.h>
-// #include <unistd.h>
 #include "sys_port.h"
 #include "module.h"
 #include "tengine_ir.h"

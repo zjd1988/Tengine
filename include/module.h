@@ -50,15 +50,15 @@ int exec_module_init(int stop_on_all_error);
 int exec_module_exit(int stop_on_all_error);
 
 #define REGISTER_MODULE_INIT_ARG(level, name, func, arg)        \
-    DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(func));        \
-    static void UNIQ_DUMMY_NAME(func)(void)                            \
+    DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(mod_init));          \
+    static void UNIQ_DUMMY_NAME(mod_init)(void)                 \
     {                                                           \
         register_norm_module_init(level, name, func, arg);      \
     }                                                           
 
 #define REGISTER_CRIT_MODULE_INIT_ARG(level, name, func, arg)   \
-    DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(func));        \
-    static void UNIQ_DUMMY_NAME(func)(void)                            \
+    DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(mod_init));          \
+    static void UNIQ_DUMMY_NAME(mod_init)(void)                 \
     {                                                           \
         register_crit_module_init(level, name, func, arg);      \
     }                                                           
@@ -69,16 +69,16 @@ int exec_module_exit(int stop_on_all_error);
 #define REGISTER_MODULE_INIT(level, name, func) REGISTER_MODULE_INIT_ARG(level, name, func, NULL)
 
 #define REGISTER_MODULE_EXIT_ARG(level, name, func, arg)        \
-    DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(func));        \
-    static void UNIQ_DUMMY_NAME(func)(void)                            \
+    DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(mod_exit));          \
+    static void UNIQ_DUMMY_NAME(mod_exit)(void)                 \
     {                                                           \
         register_module_exit(level, name, func, arg);           \
     }
           
 
 #define REGISTER_CRIT_MODULE_EXIT_ARG(level, name, func, arg)   \
-    DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(func));        \
-    static void UNIQ_DUMMY_NAME(func)(void)                            \
+    DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(mod_exit));          \
+    static void UNIQ_DUMMY_NAME(mod_exit)(void)                 \
     {                                                           \
         register_module_exit(level, name, func, arg);           \
     }

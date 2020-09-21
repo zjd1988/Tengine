@@ -43,7 +43,7 @@
 
 #include "tengine_c_api.h"
 
-#if defined(__ANDROID__) ||  defined(__APPLE__)
+#ifndef _WIN32
 #include <sys/syscall.h>
 #include <sched.h>
 #include <unistd.h>

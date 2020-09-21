@@ -52,6 +52,6 @@ extern void release_nn_dev_registry(void);
 extern int register_nn_device(struct nn_device* dev);
 
 #define REGISTER_NN_DEVICE(dev) \
-    REGISTER_MODULE_INIT_ARG(MOD_DEVICE_LEVEL, "register_nn_device", register_nn_device, dev)
+    REGISTER_MODULE_INIT_ARG(MOD_DEVICE_LEVEL, "register_nn_device", ( module_init_func_t )register_nn_device, dev)
 
 #endif

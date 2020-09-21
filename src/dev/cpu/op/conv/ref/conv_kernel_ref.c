@@ -185,7 +185,7 @@ static void im2col_uint8(struct ir_tensor* input, struct ir_tensor* output, stru
     int image_size = input->dims[1] * input->dims[2] * input->dims[3];
     int group_size = input_chan * input->dims[2] * input->dims[3];
 
-    void* input_base = (void*)((char*)input->data + (n * image_size + group * group_size) * input->elem_size);
+    void* input_base = (void*)((char*)(input->data) + (n * image_size + group * group_size) * input->elem_size);
     void* im2col_buf = priv_info->im2col_buffer;
 
     float scale = input->scale;
