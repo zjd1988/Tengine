@@ -27,8 +27,8 @@ tengine_example(tm_yolov4                   tm_yolov4.cpp)
 
 # add examples with opencv
 if (${TENGINE_TARGET_PROCESSOR} MATCHES "X86")
-    find_package(OpenCV REQUIRED)
-    include_directories(${OpenCV_INCLUDE_DIRS})
+    # find_package(OpenCV REQUIRED)
+    # include_directories(${OpenCV_INCLUDE_DIRS})
 
     if(OpenCV_FOUND)
         # macro for adding examples

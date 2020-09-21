@@ -21,8 +21,11 @@
  * Copyright (c) 2020, OPEN AI LAB
  * Author: qtang@openailab.com
  */
-
+#ifdef _WIN32
+#include "getopt/getopt.h"
+#else
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -40,6 +43,14 @@
 #define DEFAULT_MEAN3 122.679
 #define DEFAULT_LOOP_COUNT 1
 #define DEFAULT_THREAD_COUNT 1
+
+#ifndef __DBL_MAX__
+#define __DBL_MAX__ ((double)1.79769313486231570815e+308L)
+#endif
+
+#ifndef __DBL_MIN__
+#define __DBL_MIN__ ((double)2.22507385850720138309e-308L)
+#endif
 
 int tengine_classify(const char* model_file, const char* image_file, int img_h, int img_w, const float* mean,
                      const float* scale, int loop_count, int num_thread)

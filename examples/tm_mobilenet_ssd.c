@@ -21,8 +21,11 @@
  * Copyright (c) 2020, OPEN AI LAB
  * Author: qtang@openailab.com
  */
-
+#ifdef _WIN32
+#include "getopt/getopt.h"
+#else
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -33,6 +36,14 @@
 
 #define DEFAULT_REPEAT_COUNT 1
 #define DEFAULT_THREAD_COUNT 1
+
+#ifndef __DBL_MAX__
+#define __DBL_MAX__ ((double)1.79769313486231570815e+308L)
+#endif
+
+#ifndef __DBL_MIN__
+#define __DBL_MIN__ ((double)2.22507385850720138309e-308L)
+#endif
 
 typedef struct Box
 {
