@@ -54,15 +54,14 @@ int exec_module_exit(int stop_on_all_error);
     static void UNIQ_DUMMY_NAME(mod_init)(void)                 \
     {                                                           \
         register_norm_module_init(level, name, func, arg);      \
-    }                                                           
+    }
 
 #define REGISTER_CRIT_MODULE_INIT_ARG(level, name, func, arg)   \
     DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(mod_init));          \
     static void UNIQ_DUMMY_NAME(mod_init)(void)                 \
     {                                                           \
         register_crit_module_init(level, name, func, arg);      \
-    }                                                           
-
+    }
 
 #define REGISTER_CRIT_MODULE_INIT(level, name, func) REGISTER_CRIT_MODULE_INIT_ARG(level, name, func, NULL)
 
@@ -74,7 +73,6 @@ int exec_module_exit(int stop_on_all_error);
     {                                                           \
         register_module_exit(level, name, func, arg);           \
     }
-          
 
 #define REGISTER_CRIT_MODULE_EXIT_ARG(level, name, func, arg)   \
     DECLARE_AUTO_INIT_FUNC(UNIQ_DUMMY_NAME(mod_exit));          \
@@ -82,7 +80,6 @@ int exec_module_exit(int stop_on_all_error);
     {                                                           \
         register_module_exit(level, name, func, arg);           \
     }
-
 
 #define REGISTER_CRIT_MODULE_EXIT(level, name, func) REGISTER_CRIT_MODULE_EXIT_ARG(level, name, func, NULL)
 

@@ -39,9 +39,7 @@
 
 #endif
 
-#ifndef _WIN32
 extern int get_tengine_errno(void);
-#endif
 extern void set_tengine_errno(int err_num);
 
 #endif

@@ -349,11 +349,6 @@ static int run(struct node_ops* node_ops, struct exec_node* exec_node, struct ex
 
 #ifdef _WIN32
     struct shape_dim *sd = (struct shape_dim*)sys_malloc(sizeof(struct shape_dim) * out_num);
-    if(sd == NULL)
-    {
-        set_tengine_errno(ENOMEM);
-        return -1;        
-    }
 #else
     struct shape_dim sd[out_num];
 #endif

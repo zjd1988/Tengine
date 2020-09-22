@@ -46,11 +46,6 @@ static int infer_shape(struct ir_node* node)
     int dims_len = input->dim_num;
 #ifdef _WIN32
         int *dims_in = (int*)sys_malloc(dims_len);
-        if(dims_in == NULL)
-        {
-            set_tengine_errno(ENOMEM);
-            return -1;
-        }
 #else    
     int dims_in[dims_len];
 #endif
