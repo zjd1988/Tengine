@@ -21,7 +21,11 @@
  * Copyright (c) 2020, OPEN AI LAB
  * Author: qtang@openailab.com
  */
-
+#ifdef _WIN32
+#include "getopt/getopt.h"
+#else
+#include <unistd.h>
+#endif
 #include <iostream>
 #include <string>
 #include <vector>

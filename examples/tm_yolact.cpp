@@ -38,7 +38,11 @@
  */
 
 
+#ifdef _WIN32
+#include "getopt/getopt.h"
+#else
 #include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <vector>

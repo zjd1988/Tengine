@@ -1,4 +1,8 @@
+#ifdef _WIN32
+#include "getopt/getopt.h"
+#else
 #include <unistd.h>
+#endif
 #include <iostream>
 #include <iomanip>
 #include <string>

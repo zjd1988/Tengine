@@ -37,7 +37,11 @@
  * https://opensource.org/licenses/BSD-3-Clause
  */
 
+#ifdef _WIN32
+#include "getopt/getopt.h"
+#else
 #include <unistd.h>
+#endif
 #include <vector>
 #include <string>
 #include <algorithm>
