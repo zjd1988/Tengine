@@ -185,7 +185,7 @@ static void im2col_ir(struct ir_tensor* input, struct ir_tensor* output, struct 
     int image_size = input->dims[1] * input->dims[2] * input->dims[3];
     int group_size = input_chan * input->dims[2] * input->dims[3];
 
-    uint8_t* input_base = (uint8_t*)(input->data) + (n * image_size + group * group_size) * input->elem_size;
+    float* input_base = (float*)((uint8_t*)(input->data) + (n * image_size + group * group_size) * input->elem_size);
     float* im2col_buf = (float*)priv_info->im2col_buffer;
 
     if (input->data_type == TENGINE_DT_UINT8)
