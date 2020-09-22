@@ -32,6 +32,7 @@
     (type*)((char*)ptr - offsetof(type, member))
 
 #else
+#undef DLLEXPORT
 #define DLLEXPORT __attribute__((visibility("default")))
 
 #ifndef offsetof
