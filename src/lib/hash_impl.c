@@ -320,7 +320,11 @@ static hash_entry_t get_next_entry(struct hash* t)
 
         if (!list_entry_is_last(h->seq_ptr, &b->head, link))
         {
+#ifdef _WIN32            
             h->seq_ptr = list_entry_next(h->seq_ptr, struct hash_entry, link);
+#else
+            h->seq_ptr = list_entry_next(h->seq_ptr, link);
+#endif            
             return h->seq_ptr;
         }
 
