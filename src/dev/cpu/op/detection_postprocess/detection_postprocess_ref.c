@@ -245,6 +245,9 @@ int ref_dpp_fp32(const float* input_f, const float* score_f, const float* anchor
             memcpy(picked_boxes + all_picked_size, class_box + z, sizeof(struct Dpp_Box));
             all_picked_size++;
         }
+#ifdef _WIN32
+        free(picked);
+#endif        
     }
 
     sort_boxes_by_score(picked_boxes, max_picked_boxes);

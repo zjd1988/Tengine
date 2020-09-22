@@ -23,6 +23,9 @@
  */
 
 #include <math.h>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 #include "sys_port.h"
 #include "module.h"
 #include "tengine_errno.h"

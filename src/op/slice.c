@@ -45,7 +45,7 @@ static int infer_shape(struct ir_node* node)
     struct slice_param* slice_param = ( struct slice_param* )(node->op.param_mem);
     int dims_len = input->dim_num;
 #ifdef _WIN32
-        int *dims_in = (int*)sys_malloc(dims_len);
+    int *dims_in = (int*)sys_malloc(dims_len);
 #else    
     int dims_in[dims_len];
 #endif
@@ -83,8 +83,6 @@ static int infer_shape(struct ir_node* node)
 #endif
                 return -1;
             }
-            // if (slice_axis > ( int )dims_len)
-            //     return -1;
             dims_in[slice_axis] = dims_in[slice_axis] / out_num;
             for (int i = 0; i < out_num; i++)
             {
@@ -100,12 +98,6 @@ static int infer_shape(struct ir_node* node)
         // out_dim.reserve(input_dim.size());
 #ifdef _WIN32
         int *out_dims = (int*)sys_malloc(dim_len);
-        if(out_dims == NULL)
-        {
-            sys_free(dims_in);
-            set_tengine_errno(ENOMEM);
-            return -1;
-        }
 #else
         int out_dims[dim_len];
 #endif        
@@ -134,12 +126,6 @@ static int infer_shape(struct ir_node* node)
         int dim_len = input->dim_num;
 #ifdef _WIN32
         int *out_dims = (int*)sys_malloc(dim_len);
-        if(out_dims == NULL)
-        {
-            sys_free(dims_in);
-            set_tengine_errno(ENOMEM);
-            return -1;
-        }
 #else
         int out_dims[dim_len];
 #endif
@@ -179,12 +165,6 @@ static int infer_shape(struct ir_node* node)
         int dim_len = input->dim_num;
 #ifdef _WIN32
         int *out_dims = (int*)sys_malloc(dim_len);
-        if(out_dims == NULL)
-        {
-            sys_free(dims_in);
-            set_tengine_errno(ENOMEM);
-            return -1;
-        }
 #else
         int out_dims[dim_len];
 #endif
@@ -210,7 +190,7 @@ static int infer_shape(struct ir_node* node)
     }
     
 #ifdef _WIN32
-            sys_free(dims_in);
+    sys_free(dims_in);
 #endif    
     return 0;
 }

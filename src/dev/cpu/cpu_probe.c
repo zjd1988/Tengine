@@ -57,6 +57,9 @@ struct probed_cpu_info* get_probed_cpu_info(void)
 #else
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>

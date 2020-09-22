@@ -32,6 +32,9 @@
 #endif
 #ifndef _WIN32
 #include <sys/time.h>
+#define max(a, b) ((a) > (b) ? (a) : (b))
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
 static double get_current_time()
 {
     struct timeval tv;
@@ -39,12 +42,8 @@ static double get_current_time()
 
     return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
-#define max(a, b) ((a) > (b) ? (a) : (b))
-#define min(a, b) ((a) < (b) ? (a) : (b))
+
 #endif
-
-
-
 
 static int get_private_mem_size(struct ir_tensor* filter)
 {
