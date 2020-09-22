@@ -38,6 +38,7 @@
  */
 
 #ifdef _WIN32
+#define NOMINMAX
 #include "getopt/getopt.h"
 #else
 #include <unistd.h>

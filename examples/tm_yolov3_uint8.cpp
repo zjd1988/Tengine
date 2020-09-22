@@ -23,9 +23,11 @@
  */
 
 #ifdef _WIN32
+#define NOMINMAX
 #include "getopt/getopt.h"
 #else
 #include <unistd.h>
+#include <sys/time.h>
 #endif
 #include <iostream>
 #include <fstream>
@@ -33,7 +35,6 @@
 #include <iomanip>
 #include <string>
 #include <vector>
-#include <sys/time.h>
 #include <stdlib.h>
 #include <algorithm>
 #include "common.h"

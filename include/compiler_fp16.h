@@ -41,6 +41,23 @@
 
 #else
 
+#ifdef _WIN32
+#pragma  pack (push,1)
+struct fp16_pack
+{
+	unsigned short frac : 10;
+	unsigned char exp : 5;
+	unsigned char sign : 1;
+};
+
+struct fp32_pack
+{
+	unsigned int frac : 23;
+	unsigned char exp : 8;
+	unsigned char sign : 1;
+};
+#pragma pack(pop)
+#else
 struct fp16_pack
 {
     unsigned short frac : 10;
@@ -54,6 +71,7 @@ struct fp32_pack
     unsigned char exp : 8;
     unsigned char sign : 1;
 } __attribute__((packed));
+#endif
 
 typedef struct fp16_pack __fp16;
 

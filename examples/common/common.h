@@ -30,6 +30,10 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#define __DBL_MAX__ ((double)1.79769313486231570815e+308L)
+#define __DBL_MIN__ ((double)2.22507385850720138309e-308L)
+#define __FLT_MAX__ 3.402823466E38
+#define __FLT_MIN__ -3.402823466E38
 #else    // _WIN32
 #include <unistd.h>
 #include <sys/time.h>

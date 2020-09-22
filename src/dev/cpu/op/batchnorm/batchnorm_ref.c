@@ -62,7 +62,8 @@ static int ref_batchnorm_fp32(float* input, float* output, const struct ref_batc
 
     for (int n = 0; n < param->input_n; ++n)
     {
-        int h = 0;
+        //error C3015: OpenMP“for”语句中的初始化格式不正确
+		int h = 0;
 #pragma omp parallel for num_threads(num_thread)
         for (h = 0; h < param->input_h; ++h)
         {

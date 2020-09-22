@@ -3,6 +3,10 @@
 #include <assert.h>
 #include "pooling_param.h"
 
+#ifdef _WIN32
+#undef max
+#endif
+
 #define POOL_GENERIC 0
 #define POOL_K2S2 1
 #define POOL_K3S2 2
@@ -74,11 +78,17 @@ static void max_3x3s1_p1(const float* input, float* output, int inc, int inh, in
                 __m128 r2 = _mm_loadu_ps(line2);
 
                 __m128 max0 = _mm_max_ps(_mm_max_ps(r0, r1), r2);
-
+#ifdef _WIN32
+				*out_ptr = max(max(max0.m128_f32[0], max0.m128_f32[1]), max0.m128_f32[2]);
+				out_ptr++;
+				*out_ptr = max(max(max0.m128_f32[1], max0.m128_f32[2]), max0.m128_f32[3]);
+				out_ptr++;
+#else
                 *out_ptr = max(max(max0[0], max0[1]), max0[2]);
                 out_ptr++;
                 *out_ptr = max(max(max0[1], max0[2]), max0[3]);
                 out_ptr++;
+#endif
                 line0 += 2;
                 line1 += 2;
                 line2 += 2;
@@ -1645,8 +1655,11 @@ static void avg_global(const float* input, float* output, int inc, int inh, int 
             __m128 p00 = _mm_loadu_ps(line0);
             __m128 p01 = _mm_loadu_ps(line0 + 4);
             p00 = _mm_add_ps(p00, p01);
-
+#ifdef _WIN32
+			sum += (p00.m128_f32[0] + p00.m128_f32[1] + p00.m128_f32[2] + p00.m128_f32[3]);
+#else
             sum += (p00[0] + p00[1] + p00[2] + p00[3]);
+#endif
             line0 += 8;
         }
         for (int j = tail; j < in_hw; j++)
@@ -1678,7 +1691,11 @@ static void max_global(const float* input, float* output, int inc, int inh, int 
             res = _mm_max_ps(res, max0);
             line0 += 8;
         }
+#ifdef _WIN32
+		float max_ = max(max(res.m128_f32[0], res.m128_f32[1]), max(res.m128_f32[2], res.m128_f32[3]));
+#else
         float max_ = max(max(res[0], res[1]), max(res[2], res[3]));
+#endif
         for (int j = tail; j < in_hw; j++)
         {
             max_ = max(max_, line0[0]);
@@ -1803,14 +1820,15 @@ int pooling_kernel_perf_run(struct ir_tensor* input, struct ir_tensor* output, s
 
     for (int n = 0; n < batch; n++)
     {
-        void* input_frame = input->data + n * img_size * input->elem_size;
-        void* output_frame = output->data + n * feature_size * output->elem_size;
+        void* input_frame = (void*)((uint8_t*)input->data + n * img_size * input->elem_size);
+        void* output_frame = (void*)((uint8_t*)output->data + n * feature_size * output->elem_size);
 
+		int ch = 0;
 #pragma omp parallel for num_threads(num_thread)
-        for (int ch = 0; ch < c; ch++)
+        for (ch = 0; ch < c; ch++)
         {
-            void* cur_input = input_frame + ch * in_h * in_w * input->elem_size;
-            void* cur_output = output_frame + ch * out_h * out_w * output->elem_size;
+            void* cur_input = (void*)((uint8_t*)input_frame + ch * in_h * in_w * input->elem_size);
+            void* cur_output = (void*)((uint8_t*)output_frame + ch * out_h * out_w * output->elem_size);
             kernel(cur_input, cur_output, 1, in_h, in_w, out_h, out_w, param->kernel_h, param->kernel_w,
                    param->stride_h, param->stride_w, param->pad_h0, param->pad_w0, param->pad_h1, param->pad_w1,
                    is_caffe);

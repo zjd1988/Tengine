@@ -22,11 +22,16 @@
  * Author: qtang@openailab.com
  */
 
+#ifdef _WIN32
+#include "getopt/getopt.h"
+#include "common.h"
+#else
 #include <unistd.h>
+#include <sys/time.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/time.h>
 #include "tengine_c_api.h"
 
 #define DEFAULT_LOOP_COUNT      1
@@ -37,6 +42,7 @@ int loop_counts = DEFAULT_LOOP_COUNT;
 int num_threads = DEFAULT_THREAD_COUNT;
 int power       = DEFAULT_CLUSTER;
 
+#ifndef _WIN32
 double get_current_time()
 {
     struct timeval tv;
@@ -44,6 +50,7 @@ double get_current_time()
 
     return tv.tv_sec * 1000.0 + tv.tv_usec / 1000.0;
 }
+#endif
 
 int benchmark_graph(const char* graph_name, const char* model_file, int img_h, int img_w, int c, int n)
 {
