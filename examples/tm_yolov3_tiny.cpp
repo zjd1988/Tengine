@@ -648,9 +648,10 @@ int main(int argc, char* argv[])
     int layer_type = 0;
     int numBBoxes = 3;
     int total_numAnchors = 6;
-    int net_w = 416;
-    int net_h = 416;
-
+    // int net_w = 416;
+    // int net_h = 416;
+    int net_w = 384;
+    int net_h = 512;
     int res;
     while ((res = getopt(argc, argv, "m:i:r:t:h:")) != -1)
     {
@@ -768,7 +769,7 @@ int main(int argc, char* argv[])
 
     vector<layer> layers_params;
     layers_params.clear();
-    for (int i = 0; i < output_node_num; ++i)
+    for (int i = 3; i < output_node_num; ++i)
     {
         tensor_t out_tensor = get_graph_output_tensor(graph, i, 0);    //"detection_out"
         int out_dim[4];
